@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
+from .views import UserCreateView, index
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', UserCreateView.as_view(), name='zenatixuser-create')
 ]
