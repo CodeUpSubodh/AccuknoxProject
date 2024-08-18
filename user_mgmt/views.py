@@ -4,8 +4,9 @@ from rest_framework import generics
 from .models import RapifuzzUser
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import UserSerializer
+from .serializers import UserSerializer, GenerateJwtSerialiser
 from .permissions import JwtAuthentication, IsAdvancedUser
+from rest_framework.views import APIView
 def index(request):
     return HttpResponse("Welcome to the USer Management System!")
 
@@ -34,3 +35,15 @@ class UserCreateView(generics.CreateAPIView):
         
     def perform_create(self, serializer):
         return serializer.create(serializer.validated_data)
+
+class UserLoginJWT(APIView):
+     def post(self, request, *args, **kwargs):
+        user_id = request.data.get("email",None)
+        serializer = GenerateJwtSerialiser(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        encoded_token = jwt.encode(
+            {'user_id': user.id, 'exp': datetime.utcnow() + timedelta(hours=14)}, JWT_KEY)
+        response = dict()
+        response['token'] = encoded_token
+        return Response(response,status=status.HTTP_200_OK)

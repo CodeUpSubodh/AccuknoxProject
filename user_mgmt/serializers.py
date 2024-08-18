@@ -3,6 +3,7 @@ from .models import RapifuzzUser
 from rest_framework.exceptions import ValidationError
 from django.core.validators import validate_email
 import re
+from django.contrib.auth import authenticate
 from django.utils import timezone
 from cities_light.models import City, Country
 
@@ -12,6 +13,37 @@ def _is_valid_phone(phone_number):
             return True
         else:
             return False
+
+class GenerateJwtSerialiser(serializers.Serializer):
+    email = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        email = attrs.get('email')
+        password = attrs.get('password')
+        print(password)
+        if email and password:
+            try:
+                user = RapifuzzUser.objects.get(email=email)
+            except RapifuzzUser.DoesNotExist:
+                msg = ("User does not exist")
+                raise serializers.ValidationError(msg)
+            print(user.check_password(password))
+            if user:
+                if not user.is_active:
+                    msg = ('User account is disabled.')
+                    raise serializers.ValidationError(msg)
+            else:
+                msg = ('Unable to log in with provided credentials.')
+                raise serializers.ValidationError(msg)
+        else:
+            msg = ('Must include "username" and "password" .')
+            raise serializers.ValidationError(msg)
+        attrs['user'] = user
+        return attrs
+
+
 
 class UserSerializer(serializers.ModelSerializer):
     country = serializers.CharField(write_only=True)
