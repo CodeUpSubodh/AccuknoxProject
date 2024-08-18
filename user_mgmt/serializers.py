@@ -6,6 +6,7 @@ import re
 from django.contrib.auth import authenticate
 from django.utils import timezone
 from cities_light.models import City, Country
+import jwt
 
 def _is_valid_phone(phone_number):
         pattern = re.compile(r'^\+[0-9]+-[0-9]+$')
@@ -29,8 +30,8 @@ class GenerateJwtSerialiser(serializers.Serializer):
             except RapifuzzUser.DoesNotExist:
                 msg = ("User does not exist")
                 raise serializers.ValidationError(msg)
-            print(user.check_password(password))
-            if user:
+            authenticate=user.check_password(password)
+            if authenticate:
                 if not user.is_active:
                     msg = ('User account is disabled.')
                     raise serializers.ValidationError(msg)
@@ -114,10 +115,11 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        password = validated_data.pop('password', None)
         validated_data['username'] = validated_data['email']
-        user = RapifuzzUser.objects.create(**validated_data)
-        print("Creating User")
-        print(user)
+        user = self.Meta.model(**validated_data)
+        if password:
+            user.set_password(password)
         user.save()
         return user
     

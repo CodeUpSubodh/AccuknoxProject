@@ -89,7 +89,11 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Ensure you replace this with your custom backend
+]
 
+AUTH_USER_MODEL = 'user_mgmt.RapifuzzUser'
 
 
 # Password validation

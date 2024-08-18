@@ -7,8 +7,6 @@ from django.contrib.auth.models import AbstractUser, Group, Permission, UserMana
 
 
 class RapifuzzUserUserManager(UserManager):
-
-    
     def create_user(self,username ,email, password, **extra_fields):
         if not email:
             raise ValueError("The Email must be set")
@@ -16,7 +14,6 @@ class RapifuzzUserUserManager(UserManager):
         user = self.model(email=email)
         
         user.is_superuser = extra_fields['is_superuser']
-        user.is_staff = extra_fields['is_staff']
         user.is_active = extra_fields['is_active']
             
         user.set_password(password)

@@ -7,10 +7,12 @@ from rest_framework.response import Response
 from .serializers import UserSerializer, GenerateJwtSerialiser
 from .permissions import JwtAuthentication, IsAdvancedUser
 from rest_framework.views import APIView
+import jwt
+from datetime import datetime, timedelta
 def index(request):
     return HttpResponse("Welcome to the USer Management System!")
 
-
+JWT_KEY='MIICXQIBAAKBgQCJ2+HrfX5w2caQwQalxE4WBUrA+SbZFCoLGJU71GFIfVqUVhgF'
 class UserCreateView(generics.CreateAPIView):
     queryset = RapifuzzUser.objects.all()
     serializer_class = UserSerializer
