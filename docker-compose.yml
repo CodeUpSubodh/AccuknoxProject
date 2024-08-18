@@ -9,8 +9,6 @@ services:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
     networks:
       - app-network
 
@@ -19,6 +17,7 @@ services:
     command: gunicorn --bind 0.0.0.0:8000 --reload user_ticketing.wsgi:application
     volumes:
       - .:/user_ticketing
+      - static_volume:/user_ticketing/staticfiles
     ports:
       - "8000:8000"
     env_file:
@@ -28,9 +27,22 @@ services:
     networks:
       - app-network
 
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - static_volume:/user_ticketing/staticfiles
+      - ./ngnix.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"  # Changing the external port to 8080
+    depends_on:
+      - web
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
 
 volumes:
   postgres_data:
+  static_volume:

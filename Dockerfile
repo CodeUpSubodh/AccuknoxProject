@@ -20,7 +20,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy project files
-COPY . /user_ticket_sys/
+COPY . .
+RUN mkdir -p /user_ticketing/staticfiles
+# Collect static files
+RUN python manage.py collectstatic --no-input
 
 # Expose the port Django will run on
 EXPOSE 8000
