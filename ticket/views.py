@@ -34,17 +34,36 @@ class TicketCreateView(generics.RetrieveUpdateAPIView):
         return serializer.create(serializer.validated_data)
 
     def get(self, request, *args, **kwargs):
-        """Handles GET request to view a ticket."""
         ticket_id = kwargs.get('pk')
         try:
             ticket=Ticket.objects.get(id=ticket_id)
         except:
             return Response({'error':'Ticket Does Not Exsist'})
+        request_data_user = self.request.user
+        print(request_data_user)
+        print(ticket.reporter)
+        if request_data_user.id == ticket.reporter.id:
+            data = {
+                'entity_type': ticket.entity_type,
+                'priority': ticket.priority,
+                'status': ticket.status,
+                'details': ticket.incident_details,
+                'ticket_id':ticket.incident_id
+             }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+                return Response({"error": "No permission to return this user"})
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
         data = {
-            'entity_type': ticket.entity_type,
-            'priority': ticket.priority,
-            'status': ticket.status,
-            'details': ticket.incident_details,
-            'ticket_id':ticket.incident_id
-            }
+            'status': 'success',
+            'message': 'Ticket updated successfully',
+            'ticket_id': instance.incident_id,
+        }
         return Response(data, status=status.HTTP_200_OK)

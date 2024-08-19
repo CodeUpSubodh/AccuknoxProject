@@ -32,7 +32,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ticket = self.Meta.model(**validated_data)
-        ticket.reporter_id=1
+        ticket.reporter_id=self.context.get('request').user.id
         ticket.save()
         return ticket
     
