@@ -3,4 +3,5 @@ from .views import TicketCreateView
 
 urlpatterns = [
     path('', TicketCreateView.as_view(), name='create-ticket'),
+    path('<int:pk>/', TicketCreateView.as_view(), name='ticket-detail'),
 ]
