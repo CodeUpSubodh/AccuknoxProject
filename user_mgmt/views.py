@@ -5,7 +5,7 @@ from .models import RapifuzzUser
 from rest_framework import status
 from rest_framework.response import Response
 from .serializers import UserSerializer, GenerateJwtSerialiser
-from .permissions import JwtAuthentication, IsAdvancedUser
+from .permissions import JwtAuthentication, IsAdvancedUser, IsBasicUser
 from rest_framework.views import APIView
 import jwt
 from datetime import datetime, timedelta

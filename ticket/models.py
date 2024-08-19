@@ -43,7 +43,7 @@ class Ticket(models.Model):
             self.incident_id = self.generate_incident_id()
         super().save(*args, **kwargs)
 
-    def generate_ticket_id(self):
+    def generate_incident_id(self):
         current_year = timezone.now().year
         random_number = ''.join(random.choices(string.digits, k=5))
         return f"RMG{random_number}{current_year}"
