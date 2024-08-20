@@ -52,7 +52,7 @@ class TicketCreateView(generics.RetrieveUpdateAPIView):
              }
             return Response(data, status=status.HTTP_200_OK)
         else:
-                return Response({"error": "No permission to return this user"})
+                return Response({"error": "No permission to view the ticket"})
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -60,10 +60,12 @@ class TicketCreateView(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        
-        data = {
-            'status': 'success',
-            'message': 'Ticket updated successfully',
-            'ticket_id': instance.incident_id,
-        }
-        return Response(data, status=status.HTTP_200_OK)
+        if request_data_user.id == ticket.reporter.id:
+            data = {
+                'status': 'success',
+                'message': 'Ticket updated successfully',
+                'ticket_id': instance.incident_id,
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+                return Response({"error": "No permission to edit this ticket"})
