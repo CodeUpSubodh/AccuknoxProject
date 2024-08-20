@@ -4,3 +4,4 @@ psycopg2-binary<3.0,>=2.9
 django-cities-light
 djangorestframework==3.14.0
 PyJWT==2.6.0
+django-cors-headers
