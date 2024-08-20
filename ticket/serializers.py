@@ -16,7 +16,7 @@ class TicketSerializer(serializers.ModelSerializer):
         
 
     def validate_entity_type(self,value):
-        if value.lower() not in ['enterprise','goverment']:
+        if value.lower() not in ['enterprise','government']:
             raise ValidationError({"error":{"message":"Invalid Entity Selection"}})
         return value
 
