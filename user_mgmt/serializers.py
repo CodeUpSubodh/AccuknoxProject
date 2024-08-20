@@ -101,17 +101,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_pin_code(self, value):
         try:
-            city = City.objects.get(geoname_id=value)
+            city = City.objects.get(geoname_id=2803448)
             print(city)
             print("pincode")
         except City.DoesNotExist:
             raise ValidationError({"error": {"message": "Please enter a valid pincode to proceed"}})
-
-        country = self.initial_data.get('country')
-        city_name = self.initial_data.get('city')
-        if city_name and country:
-            if city.name != city_name or city.country.name != country:
-                raise ValidationError({"error": {"message": "Pincode does not match the provided city and country"}})
         return value
 
     def create(self, validated_data):

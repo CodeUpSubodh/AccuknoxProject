@@ -25,7 +25,7 @@ class TicketCreateView(generics.RetrieveUpdateAPIView):
         ticket.save()
         data = {
             'status': 'success',
-            'message': 'Ticket added successfully, verification pending',
+            'message': 'Ticket added successfully',
             'ticket_id':ticket.incident_id,
             }
         return Response(data, status=status.HTTP_201_CREATED)
@@ -60,6 +60,9 @@ class TicketCreateView(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
+        ticket_id = kwargs.get('pk')
+        ticket=Ticket.objects.get(id=ticket_id)
+        request_data_user = self.request.user
         if request_data_user.id == ticket.reporter.id:
             data = {
                 'status': 'success',
@@ -69,3 +72,28 @@ class TicketCreateView(generics.RetrieveUpdateAPIView):
             return Response(data, status=status.HTTP_200_OK)
         else:
                 return Response({"error": "No permission to edit this ticket"})
+
+
+class UserTicketListView(generics.ListAPIView):
+    authentication_classes = [JwtAuthentication]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Ticket.objects.filter(reporter=user)
+
+    def get(self, request, *args, **kwargs):
+        tickets = self.get_queryset()
+        data = []
+        for ticket in tickets:
+            data.append({
+                'id': ticket.id,
+                'ticket_id': ticket.incident_id,  # Assuming `incident_id` is a unique identifier
+                'entity_type': ticket.entity_type,
+                'priority': ticket.priority,
+                'status': ticket.status,
+                'details': ticket.incident_details,  # Ensure this is included
+                'incident_id': ticket.incident_id,
+                'reporter': ticket.reporter.username  # Adjust based on your reporter field
+            })
+
+        return Response(data)

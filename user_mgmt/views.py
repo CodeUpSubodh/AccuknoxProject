@@ -27,7 +27,7 @@ class UserCreateView(generics.CreateAPIView):
         user.save()
         data = {
             'status': 'success',
-            'message': 'User added successfully, verification pending',
+            'message': 'User added successfully',
             'user_id':user.id,
             'username':user.username,
             'source':'admin'
