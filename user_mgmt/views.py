@@ -1,11 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework import generics
-from .models import RapifuzzUser
+from .models import CustomUser
 from rest_framework import status
 from rest_framework.response import Response
 from .serializers import UserSerializer, GenerateJwtSerialiser
-from .permissions import JwtAuthentication, IsAdvancedUser, IsBasicUser
 from rest_framework.views import APIView
 import jwt
 from datetime import datetime, timedelta
@@ -14,10 +13,8 @@ def index(request):
 
 JWT_KEY='MIICXQIBAAKBgQCJ2+HrfX5w2caQwQalxE4WBUrA+SbZFCoLGJU71GFIfVqUVhgF'
 class UserCreateView(generics.CreateAPIView):
-    queryset = RapifuzzUser.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    # permission_classes = [IsAdvancedUser]
-    # authentication_classes = [JwtAuthentication]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

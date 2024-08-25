@@ -1,11 +1,10 @@
 from rest_framework import serializers,status
-from .models import RapifuzzUser
+from .models import CustomUser
 from rest_framework.exceptions import ValidationError
 from django.core.validators import validate_email
 import re
 from django.contrib.auth import authenticate
 from django.utils import timezone
-from cities_light.models import City, Country
 import jwt
 
 def _is_valid_phone(phone_number):
@@ -26,8 +25,8 @@ class GenerateJwtSerialiser(serializers.Serializer):
         print(password)
         if email and password:
             try:
-                user = RapifuzzUser.objects.get(email=email)
-            except RapifuzzUser.DoesNotExist:
+                user = CustomUser.objects.get(email=email)
+            except CustomUser.DoesNotExist:
                 msg = ("User does not exist")
                 raise serializers.ValidationError(msg)
             authenticate=user.check_password(password)
@@ -47,16 +46,13 @@ class GenerateJwtSerialiser(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    country = serializers.CharField(write_only=True)
-    city = serializers.CharField(write_only=True)
-    pin_code = serializers.CharField(write_only=True)
     class Meta:
-        model = RapifuzzUser
+        model = CustomUser
         exclude = ('username',)
         
 
     def validate_phone_number(self,value):
-        phone_numbers = RapifuzzUser.objects.values_list('phone_number',flat=True)
+        phone_numbers = CustomUser.objects.values_list('phone_number',flat=True)
         if not _is_valid_phone(value):
             raise ValidationError({"error":{"message":"Please enter a valid phone number to continue"}})
         if len(value) < 12:
@@ -69,7 +65,7 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def validate_email(self,value):
-        emails = RapifuzzUser.objects.values_list('email',flat=True)
+        emails = CustomUser.objects.values_list('email',flat=True)
         try:
             validate_email(value.lower())
         except:
@@ -83,30 +79,6 @@ class UserSerializer(serializers.ModelSerializer):
             raise ValidationError({"error":{"message":"Email already present, please enter a different one"}})
 
         return value.lower()
-
-    def validate_country(self,value):
-        try:
-            country=Country.objects.get(name=value)
-        except Country.DoesNotExist:
-            raise ValidationError({"error":{"message":"Please entery a Valid Country to Proceed"}})
-        return country
-
-    def validate_city(self,value):
-        try:
-            city=City.objects.get(name=value)
-            print(city)
-        except City.DoesNotExist:
-            raise ValidationError({"error":{"message":"Please entery a Valid City to Proceed"}})
-        return city
-
-    def validate_pin_code(self, value):
-        try:
-            city = City.objects.get(geoname_id=2803448)
-            print(city)
-            print("pincode")
-        except City.DoesNotExist:
-            raise ValidationError({"error": {"message": "Please enter a valid pincode to proceed"}})
-        return value
 
     def create(self, validated_data):
         password = validated_data.pop('password', None)

@@ -41,9 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user_mgmt',
-    'ticket',
-    'cities_light',
+    'friendships',
     'corsheaders',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -96,7 +96,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Ensure you replace this with your custom backend
 ]
 
-AUTH_USER_MODEL = 'user_mgmt.RapifuzzUser'
+AUTH_USER_MODEL = 'user_mgmt.CustomUser'
 CORS_ALLOW_ALL_ORIGINS = True
 
 # Password validation
